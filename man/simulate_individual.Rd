@@ -12,6 +12,7 @@ simulate_individual(
   individual_s_fn,
   battery_s_fn,
   rec_info,
+  raster,
   polygon,
   b_frame,
   ou_opts = NULL,
@@ -20,7 +21,8 @@ simulate_individual(
   end_crs,
   end_time = as.POSIXct("2025-12-31 23:59:59", tz = "UTC"),
   delayRNG = c(60, 180),
-  burstDur = 5
+  burstDur = 5,
+  timestep_per_day = 0.75
 )
 }
 \arguments{
@@ -55,6 +57,8 @@ simulate_individual(
 \item{delayRNG}{the min/max delay time from transmission to the next}
 
 \item{burstDur}{number of seconds for the duration of the transmission}
+
+\item{timestep_per_day}{the number of tries for sim_ou_boundry}
 }
 \description{
 Simulate one individual's detections and track.

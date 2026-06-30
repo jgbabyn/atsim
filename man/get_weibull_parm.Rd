@@ -11,7 +11,8 @@ get_weibull_parm(
   lower_bound = c(0, 0),
   upper_bound = c(5, 5),
   maxiter = 1000,
-  numIslands = 8
+  numIslands = 8,
+  parallel = TRUE
 )
 }
 \arguments{

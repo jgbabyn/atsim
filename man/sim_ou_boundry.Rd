@@ -11,7 +11,8 @@ sim_ou_boundry(
   a = diag(0.5, 2),
   x0,
   sigma = matrix(c(50, 0, 50, 0), nrow = 2),
-  speed = 2
+  speed = 2,
+  maxtries = 100
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ sim_ou_boundry(
 \item{sigma}{the 2x2 matrix controlling the random noise in the movement}
 
 \item{speed}{max speed in km/h}
+
+\item{maxtries}{the number of tries to keep finding a point outside the boundary}
 }
 \description{
 This merges elements of glatos' crw_in_polygon and adeHabitatLT simm.mou. You can simulate

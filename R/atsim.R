@@ -507,7 +507,15 @@ plot_individual <- function(individual,ylim=NULL,xlim=NULL){
     }
 
     
-    pl = ggplot2::ggplot() + geom_sf(data=map)  + geom_path(aes(color=path$timesteps,x=X,y=Y),data=path_coords) +  geom_point(data=path_coords[1,],aes(x=X,y=Y),shape=23,color="orange",fill="orange",size=2) + geom_point(data=path_coords[nrow(path_coords),],aes(x=X,y=Y),shape=23,color="green",fill="green",size=2) + geom_point(data=b_coords,aes(x=X,y=Y),color="red",shape=24) + ggplot2::coord_sf(xlim=xlim,ylim=ylim,crs=sf::st_crs(map))
+    pl = ggplot2::ggplot() + geom_sf(data=map)  + geom_path(aes(color=path$timesteps,x=X,y=Y),data=path_coords) +  geom_point(data=path_coords[1,],aes(x=X,y=Y),shape=23,color="orange",fill="orange",size=2) + geom_point(data=path_coords[nrow(path_coords),],aes(x=X,y=Y),shape=23,color="green",fill="green",size=2) + geom_point(data=b_coords,aes(x=X,y=Y),color="red",shape=24)
+    if(nrow(individual$detections) > 0){
+        qd = individual$detections |>
+            dplyr::group_by(rec_x,rec_y) |>
+            dplyr::summarise(n_det=n())
+        
+       pl = pl + geom_point(data=qd,aes(x=rec_x,y=rec_y,size=sqrt(n_det)))
+    }
+    pl = pl + ggplot2::coord_sf(xlim=xlim,ylim=ylim,crs=sf::st_crs(map))
 
     pl
 
@@ -553,11 +561,12 @@ build_sim_dataset <- function(indiv_list,n){
         y$b_fail_before_d = y$BatteryFailDate <= y$DeathDateTime
         y
     })
-    fish_info =  do.call(rbind,fish_info)
+    fish_info <- data.table::rbindlist(fish_info, use.names = TRUE, fill = TRUE)
+  
     detections = lapply(got,function(x){
         x$detections
     })
-    detections = do.call(rbind,detections)
+    detections <- data.table::rbindlist(detections, use.names = TRUE, fill = TRUE)
 
     ret = list(fish_info=fish_info,detections=detections)
     ret
