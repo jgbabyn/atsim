@@ -317,7 +317,7 @@ sim_ou_boundry <- function(polygon,timesteps,b,a=diag(0.5,2),x0,sigma=matrix(c(5
 path_transmissions <- function(path,timesteps,delayRNG = c(60,180),burstDur=5,tz="UTC"){
 
     sec_diff = as.numeric(difftime(timesteps[length(timesteps)],timesteps[1],units="secs",tz=tz))
-    max_tran = sec_diff/65
+    max_tran = sec_diff/(delayRNG[1]+burstDur)
     trans_t = runif(max_tran,delayRNG[1],delayRNG[2])+burstDur
     ctrans_t = cumsum(trans_t)
     ntimesteps = as.POSIXct(timesteps[1] + ctrans_t,tz=tz)
