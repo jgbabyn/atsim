@@ -548,10 +548,11 @@ sim_emp_surv_fn <- function(ReleaseDateTime,DeathDateTime){
 #'
 #' @param indiv_list list of objects from simulate_individuals
 #' @param n the number of individuals to include in the data set
+#' @param crs if not null the CRS to convert x and y coordinates to (assumes lat and lon from start)
 #' 
 #' @export
 #'
-build_sim_dataset <- function(indiv_list,n){
+build_sim_dataset <- function(indiv_list,n,crs=NULL){
     to_get = sample(1:length(indiv_list),n)
 
     got = indiv_list[to_get]
@@ -562,11 +563,35 @@ build_sim_dataset <- function(indiv_list,n){
         y
     })
     fish_info <- data.table::rbindlist(fish_info, use.names = TRUE, fill = TRUE)
-  
+    if(is.numeric(fish_info$fish_id)){
+        fish_info$fish_id = as.character(fish_info$fish_id)
+    }
+    
     detections = lapply(got,function(x){
         x$detections
     })
     detections <- data.table::rbindlist(detections, use.names = TRUE, fill = TRUE)
+
+    if(!is.null(crs)){
+        dsf1 = sf::st_as_sf(detections,coords=c("rec_x","rec_y"),crs=4326)
+        dsf1t = sf::st_transform(dsf1,crs)
+        d1c = sf::st_coordinates(dsf1t)
+        detections$rec_x = d1c[,1]
+        detections$rec_y = d1c[,2]
+
+        dsf2 = sf::st_as_sf(detections,coords=c("fish_x","fish_y"),crs=4326)
+        dsf2t = sf::st_transform(dsf2,crs)
+        d2c = sf::st_coordinates(dsf2t)
+        detections$fish_x = d2c[,1]
+        detections$fish_y = d2c[,2]
+
+        fsf = sf::st_as_sf(fish_info,coords=c("rel_x","rel_y"),crs=4326)
+        fsft = sf::st_transform(fsf,crs)
+        fc = sf::st_coordinates(fsft)
+        fish_info$rel_x = fc[,1]
+        fish_info$rel_y = fc[,2]
+    }
+        
 
     ret = list(fish_info=fish_info,detections=detections)
     ret
